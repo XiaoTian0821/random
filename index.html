@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+    body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: #f9fafb;
+    color: #333;
+    margin: 0;
+    padding: 2rem;
+    }
+
+    #holiday {
+    max-width: 900px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    #holiday h2 {
+    background: linear-gradient(90deg, #007bff, #00bcd4);
+    color: #fff;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    margin-top: 2rem;
+    margin-bottom: 0.8rem;
+    font-size: 1.3rem;
+    letter-spacing: 0.5px;
+    }
+
+    table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 2rem;
+    overflow: hidden;
+    border-radius: 10px;
+    }
+
+    table thead {
+    background-color: #007bff;
+    color: #fff;
+    }
+
+    table th, table td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+    }
+
+    table tr:nth-child(even) {
+    background-color: #f3f4f6;
+    }
+
+    table tr:hover {
+    background-color: #e0f2fe;
+    transition: 0.2s;
+    }
+
+    #loader {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255,255,255,0.9);
+    padding: 1.5rem 3rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #007bff;
+    text-align: center;
+    z-index: 1000;
+    }
+
+    @keyframes fadeIn {
+    from { opacity: 0; transform: translate(-50%, -45%); }
+    to { opacity: 1; transform: translate(-50%, -50%); }
+    }
+    #loader.active {
+    display: block;
+    animation: fadeIn 0.3s ease-out;
+    }
+</style>
+</head>
+<body>
+    <div>
+        <select onchange="fetchholiday(this.value);">
+            <option value="2015">2015</option>
+            <option value="2016">2016</option>
+            <option value="2017">2017</option>
+            <option value="2018">2018</option>
+            <option value="2019">2019</option>
+            <option value="2020">2020</option>
+            <option value="2021">2021</option>
+            <option value="2022">2022</option>
+            <option value="2023">2023</option>
+            <option value="2024">2024</option>
+        </select>
+    </div>
+    <table id="aa">
+        <thead>
+            <th>Date</th>
+            <th>Weekday</th>
+            <th>Public holiday</th>
+        </thead>
+        <body id="holiday">
+            
+        </body>
+    </table>
+</body>
+</html>
+
+<script>
+function fetchholiday(year){
+    let a=year.toString();
+
+    fetch('https://publicholidays.com.my/penang/')
+    .then(response => response.text())
+    .then(html => {
+      const tempElement = document.createElement('div');
+      tempElement.innerHTML = html;
+      
+      const tableContent = tempElement.querySelectorAll('.publicholidays');
+
+     
+      let i=0;
+      tableContent.forEach(element=>{
+        const table=document.createElement('table');
+        table.innerHTML+=`<thead>
+          <th>Date</th>
+          <th>Weekday</th>
+          <th>Public holiday</th>
+        </thead>`;
+
+        const tbody=document.createElement('tbody');
+        const getholiday=element.querySelectorAll('tbody tr');
+        getholiday.forEach(item=>{
+            tbody.append(item);
+        });
+        const holidayyear=tempElement.querySelectorAll('h2');
+        
+        const header=document.createElement('h2');
+        header.innerText=holidayyear[i].innerText;
+        table.append(tbody);
+        document.getElementById("holiday").append(header);
+        document.getElementById("holiday").append(table);
+        i++;
+      });  
+    })
+    .catch(error => {
+      console.error(error); document.getElementById("holiday").innerHTML="<tr><td colspan='3'>Celender record are of "+a+" are not valid yet</td></tr>";
+      hideLoader();
+    });
+    }
+
+    fetchholiday(2025);
+</script>
